@@ -37,7 +37,7 @@ function Analytics() {
     label, n: h.filter((e) => e.confidence >= 0.5 + i * 0.1 && (i === 4 ? e.confidence <= 1 : e.confidence < 0.6 + i * 0.1)).length,
   }));
   const models = Object.entries(h.flatMap((e) => e.models.map((m) => ({ ...m, agree: m.verdict === e.verdict }))).reduce<Record<string, { n: number; a: number }>>((acc, m) => {
-    acc[m.name] ??= { n: 0, a: 0 }; acc[m.name].n++; if (m.agree) acc[m.name].a++; return acc;
+    const s = (acc[m.name] ??= { n: 0, a: 0 }); s.n++; if (m.agree) s.a++; return acc;
   }, {})).map(([name, s]) => ({ name, agreement: +((s.a / s.n) * 100).toFixed(1), runs: s.n }));
 
   return (

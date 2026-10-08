@@ -38,7 +38,7 @@ function SettingsPage() {
           <div className="divide-y">
             <Row label="Threshold" hint="Deepfake probability above which media is marked FAKE.">
               <div className="flex w-full items-center gap-4 sm:w-64">
-                <Slider min={0.05} max={0.95} step={0.05} value={[s.threshold]} onValueChange={([v]) => set({ threshold: v })} />
+                <Slider min={0.05} max={0.95} step={0.05} value={[s.threshold]} onValueChange={([v]) => set({ threshold: v ?? 0.5 })} />
                 <span className="w-10 text-right font-mono text-sm">{s.threshold.toFixed(2)}</span>
               </div>
             </Row>

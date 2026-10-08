@@ -1,7 +1,7 @@
 // DeepSafe API client. Talks to the existing FastAPI backend without changing its contracts.
 // Base URL comes from VITE_API_URL (defaults to the local FastAPI port).
 export const API_URL: string =
-  (import.meta.env.VITE_API_URL as string | undefined) ?? "http://localhost:8000";
+  (import.meta.env["VITE_API_URL"] as string | undefined) ?? "http://localhost:8000";
 
 const TOKEN_KEY = "deepsafe_token";
 const USER_KEY = "deepsafe_user";
