@@ -4,7 +4,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import {
   LayoutDashboard, ScanSearch, History, BarChart3, Cpu, Settings, LogOut, Menu, X, ShieldCheck, User,
 } from "lucide-react";
-import { auth, getHealth } from "@/lib/api";
+import { auth, getHealth, getMe } from "@/lib/api";
 import { useSettings } from "@/lib/store";
 import { StatusDot } from "./ui-bits";
 import { cn } from "@/lib/utils";
@@ -43,8 +43,16 @@ export function AppShell({ title, description, children }: { title: string; desc
   const health = useHealth();
 
   useEffect(() => {
-    if (!auth.token()) navigate({ to: "/login" });
-    else { setUser(auth.user()); setReady(true); }
+    if (!auth.token()) { navigate({ to: "/login" }); return; }
+    let cancelled = false;
+    getMe()
+      .then((me) => {
+        if (cancelled) return;
+        setUser((typeof me.username === "string" && me.username) || auth.user());
+        setReady(true);
+      })
+      .catch(() => { if (!cancelled) { auth.clear(); navigate({ to: "/login" }); } });
+    return () => { cancelled = true; };
   }, [navigate]);
   useEffect(() => { document.documentElement.classList.toggle("dark", settings.darkMode); }, [settings.darkMode]);
   useEffect(() => setOpen(false), [path]);

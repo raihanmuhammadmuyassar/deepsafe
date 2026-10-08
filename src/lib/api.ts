@@ -33,25 +33,34 @@ async function errorText(res: Response) {
   }
 }
 
-export async function login(username: string, password: string) {
+async function tokenRequest(path: string, username: string, password: string) {
   const body = new URLSearchParams({ username, password });
-  const res = await fetch(`${API_URL}/auth/token`, {
+  const res = await fetch(`${API_URL}${path}`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body,
   });
   if (!res.ok) throw new Error(await errorText(res));
   const j = await res.json();
+  if (!j.access_token) throw new Error("No access token returned by server.");
   auth.set(j.access_token, username);
 }
 
-export async function register(username: string, email: string, password: string) {
-  const res = await fetch(`${API_URL}/auth/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, email, password }),
-  });
+export const login = (username: string, password: string) => tokenRequest("/token", username, password);
+
+// Backend /register uses OAuth2PasswordRequestForm (username + password only) and returns a token.
+export const register = (username: string, _email: string, password: string) =>
+  tokenRequest("/register", username, password);
+
+/** Validates the stored token against GET /users/me. Clears it if invalid. */
+export async function getMe(): Promise<{ username?: string } & Record<string, unknown>> {
+  const res = await fetch(`${API_URL}/users/me`, { headers: headers() });
+  if (res.status === 401 || res.status === 403) {
+    auth.clear();
+    throw new Error("unauthorized");
+  }
   if (!res.ok) throw new Error(await errorText(res));
+  return res.json();
 }
 
 export type ModelStatus = "online" | "loading" | "degraded" | "offline";
