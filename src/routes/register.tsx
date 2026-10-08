@@ -27,7 +27,7 @@ function Register() {
     ev.preventDefault(); setErr(null);
     if (f.p !== f.c) return setErr("Passwords do not match.");
     setBusy(true);
-    try { await register(f.u, f.e, f.p); toast.success("Account created. Please sign in."); nav({ to: "/login" }); }
+    try { await register(f.u, f.e, f.p); toast.success("Account created."); nav({ to: "/" }); }
     catch (x) { setErr(x instanceof Error ? x.message : "Registration failed"); }
     finally { setBusy(false); }
   };
